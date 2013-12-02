@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+>
+<h:head/>
+<h:body>
+<p:growl id="growl" showSummary="true" showDetail="false" autoUpdate="true"/>  
+              
+<pe:timeline id="timeline" value="#{groupingTimelineController.model}" var="order"  
+             editable="true" eventMargin="5" eventMarginAxis="0"  
+             showMajorLabels="false" axisOnTop="true"  
+             groupsChangeable="true" groupsOnRight="false"  
+             timeZone="America/New_York" widgetVar="timelineWdgt">  
+    <p:ajax event="change" update="@none" listener="#{groupingTimelineController.onChange}"/>  
+    <p:ajax event="delete" update="@none" listener="#{groupingTimelineController.onDelete}"/>  
+    <p:ajax event="add" update="@none" onstart="PF('timelineWdgt').cancelAdd()"/>  
+      
+    <h:graphicImage value="#{order.imagePath}" rendered="#{not empty order.imagePath}"  
+                    style="display:inline;vertical-align:middle;"/>  
+    <h:outputText value="Order #{order.number}"/>  
+</pe:timeline>  
+                  
+<!--  Dialog with overlapped timeline events  -->  
+<p:dialog id="overlapEventsDlg" header="Overlapped Orders" widgetVar="overlapEventsWdgt"  
+          showEffect="clip" hideEffect="clip">  
+    <h:panelGroup id="overlappedOrdersInner" layout="block" style="padding:10px;">  
+        <strong>  
+            Please choose Orders you want to merge with the Order #{groupingTimelineController.selectedOrder}  
+        </strong>  
+          
+        <p/>  
+          
+        <p:selectManyMenu id="overlappedOrders" value="#{groupingTimelineController.ordersToMerge}"  
+                          showCheckbox="true">  
+            <f:selectItems value="#{groupingTimelineController.overlappedOrders}" var="order"  
+                           itemLabel=" Order #{order.data.number}" itemValue="#{order}"/>  
+        </p:selectManyMenu>  
+    </h:panelGroup>  
+  
+    <f:facet name="footer">  
+        <h:panelGroup layout="block" style="text-align:right; padding:2px; white-space:nowrap;">  
+            <p:commandButton value="Merge" process="overlapEventsDlg" update="@none"  
+                             action="#{groupingTimelineController.merge}"  
+                             oncomplete="PF('overlapEventsWdgt').hide()"/>  
+            <p:commandButton type="button" value="Close" onclick="PF('overlapEventsWdgt').hide()"/>  
+        </h:panelGroup>  
+    </f:facet>  
+</p:dialog>
+</h:body>
+</html>
